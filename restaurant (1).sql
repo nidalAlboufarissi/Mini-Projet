@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  lun. 19 mars 2018 à 15:19
+-- Généré le :  mar. 20 mars 2018 à 11:51
 -- Version du serveur :  5.7.19
 -- Version de PHP :  5.6.31
 
@@ -77,24 +77,39 @@ CREATE TABLE IF NOT EXISTS `consomation` (
   `ID_CONSOM` int(11) NOT NULL,
   `JOUR_CONSOM` date DEFAULT NULL,
   `NBR_REC` int(11) DEFAULT NULL,
-  `PRIX_TOTAL` float DEFAULT NULL,
+  `depense_TOTAL` float DEFAULT NULL,
+  `prix_vente` double NOT NULL,
   PRIMARY KEY (`ID_CONSOM`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `ingredient`
+-- Structure de la table `ingredient_dynamique`
 --
 
-DROP TABLE IF EXISTS `ingredient`;
-CREATE TABLE IF NOT EXISTS `ingredient` (
-  `ID_INGRED` smallint(6) NOT NULL,
+DROP TABLE IF EXISTS `ingredient_dynamique`;
+CREATE TABLE IF NOT EXISTS `ingredient_dynamique` (
+  `ID_TABLE` int(11) NOT NULL AUTO_INCREMENT,
+  `ID_INGRED` int(11) NOT NULL,
+  `PRIX_UNIT` float NOT NULL,
+  `QUANTITE` float NOT NULL,
+  `JOUR` date NOT NULL,
+  PRIMARY KEY (`ID_TABLE`),
+  KEY `ID_INGRED` (`ID_INGRED`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `ingredient_statique`
+--
+
+DROP TABLE IF EXISTS `ingredient_statique`;
+CREATE TABLE IF NOT EXISTS `ingredient_statique` (
+  `ID_INGRED` int(6) NOT NULL,
   `NOM_INGRED` varchar(30) DEFAULT NULL,
-  `PRIX_UNIT` float DEFAULT NULL,
   `STOCK_MIN` float DEFAULT NULL,
-  `JOUR` date DEFAULT NULL,
-  `QUANTITE_INGRED` float DEFAULT NULL,
   PRIMARY KEY (`ID_INGRED`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -122,8 +137,8 @@ DROP TABLE IF EXISTS `rec_com`;
 CREATE TABLE IF NOT EXISTS `rec_com` (
   `NUM_COM` int(11) NOT NULL,
   `NOM_REC` varchar(100) NOT NULL,
-  PRIMARY KEY (`NUM_COM`,`NOM_REC`),
-  KEY `FK_REC_COM_REC_COM_RECETTE` (`NOM_REC`)
+  KEY `FK_REC_COM_REC_COM_RECETTE` (`NOM_REC`),
+  KEY `NUM_COM` (`NUM_COM`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -158,6 +173,18 @@ CREATE TABLE IF NOT EXISTS `rec_ingred` (
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `ingredient_dynamique`
+--
+ALTER TABLE `ingredient_dynamique`
+  ADD CONSTRAINT `ingredient_dynamique_ibfk_1` FOREIGN KEY (`ID_INGRED`) REFERENCES `ingredient_statique` (`ID_INGRED`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `rec_com`
+--
+ALTER TABLE `rec_com`
+  ADD CONSTRAINT `rec_com_ibfk_1` FOREIGN KEY (`NUM_COM`) REFERENCES `commande` (`NUM_COM`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `rec_ingred`
